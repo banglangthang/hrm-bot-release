@@ -41,9 +41,13 @@ if [ -z "$DMG_URL" ]; then
     exit 1
 fi
 
+# Download DMG to temp location
 TMP_DMG="/tmp/lazy-bot.dmg"
 echo -e "${BLUE}Downloading latest release...${NC}"
-curl -L -o "$TMP_DMG" "$DMG_URL" 2>/dev/null
+if ! curl -L -o "$TMP_DMG" "$DMG_URL" 2>/dev/null; then
+    echo -e "${RED}❌ Failed to download DMG${NC}"
+    exit 1
+fi
 echo -e "${GREEN}✅ Downloaded${NC}"
 
 # -------------------------------------------------------------------
@@ -62,15 +66,24 @@ done
 MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse -quiet | tail -1 | awk '{print $NF}')
 if [[ -z "$MOUNT_POINT" ]]; then
     echo -e "${RED}❌ Failed to mount DMG${NC}"
+    rm -f "$TMP_DMG"
     exit 1
 fi
 
-cp -R "${MOUNT_POINT}/lazy-bot.app" "/Applications/" 2>/dev/null || true
+# Install the app
+if cp -R "${MOUNT_POINT}/lazy-bot.app" "/Applications/"; then
+    echo -e "${GREEN}✅ lazy-bot.app installed to /Applications${NC}"
+else
+    echo -e "${RED}❌ Failed to install app${NC}"
+    hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null || true
+    rm -f "$TMP_DMG"
+    exit 1
+fi
+
+# Cleanup
 hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null || true
 rm -f "$TMP_DMG"
 xattr -cr "/Applications/lazy-bot.app" 2>/dev/null || true
-
-echo -e "${GREEN}✅ lazy-bot.app installed to /Applications${NC}"
 
 # -------------------------------------------------------------------
 # Step 4: Launch the app (starts MCP server on port 1222)
