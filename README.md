@@ -1,6 +1,6 @@
-# HRM MCP
+# lazy-bot
 
-A macOS menu bar app that provides AI-powered HRM timesheet management through a simple menu bar interface.
+A macOS menu bar app that provides AI-powered timesheet management through a simple menu bar interface.
 
 ## Features
 
@@ -12,7 +12,7 @@ A macOS menu bar app that provides AI-powered HRM timesheet management through a
 
 ## Quick Start
 
-1. Install using Raycast (recommended) or download `HRM-MCP.dmg` from [Releases](https://github.com/banglangthang/hrm-bot-release/releases)
+1. Install using Raycast (recommended) or download `lazy-bot.dmg` from [Releases](https://github.com/banglangthang/lazy-bot/releases)
 2. Launch the app - a menu bar icon will appear
 3. Click "Login to Service" to authenticate
 
@@ -35,7 +35,7 @@ After installing, configure your AI tool to connect to:
 ## Requirements
 
 - macOS
-- An HRM account
+- An account
 
 ## Support
 

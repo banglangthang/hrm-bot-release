@@ -5,38 +5,38 @@
 Run this single command in Terminal:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/banglangthang/hrm-bot-release/main/scripts/install_raycast.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/banglangthang/lazy-bot/main/scripts/install_raycast.sh)
 ```
 
 This will:
-1. Download and install `HRM MCP.app` to `/Applications`
+1. Download and install `lazy-bot.app` to `/Applications`
 2. Launch the server
 3. Create a Raycast config file on your Desktop
 4. Follow the on-screen instructions to complete setup
 
 ## Manual Install
 
-1. Download the latest `HRM-MCP.dmg` from the [Releases](https://github.com/banglangthang/hrm-bot-release/releases) page
-2. Open the DMG and drag `HRM MCP.app` to the **Applications** folder
+1. Download the latest `lazy-bot.dmg` from [Releases](https://github.com/banglangthang/lazy-bot/releases/latest)
+2. Open the DMG and drag `lazy-bot.app` to the **Applications** folder
 3. If you see "App is damaged" error, run in Terminal:
    ```bash
-   xattr -cr /Applications/HRM\ MCP.app
+   xattr -cr /Applications/lazy-bot.app
    ```
-4. Double-click `HRM MCP.app` to launch
+4. Double-click `lazy-bot.app` to launch
 5. A menu bar icon will appear
 
 ## First-Time Setup
 
-1. Click the HRM icon in your menu bar
+1. Click the lazy-bot icon in your menu bar
 2. Select **"Login to Service"**
 3. Complete authentication in the browser window
 
 ## Troubleshooting
 
-- **App won't open**: Run `xattr -cr /Applications/HRM\ MCP.app` in Terminal
+- **App won't open**: Run `xattr -cr /Applications/lazy-bot.app` in Terminal
 - **Menu bar icon not showing**: Check Applications folder, try launching again
 
 ## Uninstall
 
-1. Drag `HRM MCP.app` from Applications to Trash
+1. Drag `lazy-bot.app` from Applications to Trash
 2. Optionally remove data: `rm -rf ~/.hrm_mcp`
