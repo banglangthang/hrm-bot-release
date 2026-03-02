@@ -11,7 +11,7 @@ NC='\033[0m'
 
 echo ""
 echo -e "${BOLD}============================================================${NC}"
-echo -e "${BOLD}    🚀 Lazy Timesheet — One-Click Installer${NC}"
+echo -e "${BOLD}    🚀 lazy-bot — One-Click Installer${NC}"
 echo -e "${BOLD}============================================================${NC}"
 echo ""
 
@@ -29,21 +29,23 @@ echo -e "${GREEN}✅ Raycast is installed${NC}"
 # -------------------------------------------------------------------
 # Step 2: Download the latest DMG from GitHub releases
 # -------------------------------------------------------------------
-REPO="banglangthang/timesheet-bot"
-DMG_NAME="HRM.MCP-2026.02.25.dmg"
-TMP_DMG="/tmp/${DMG_NAME}"
-
-echo -e "${BLUE}Downloading latest release...${NC}"
-
-# Get the latest release tag
+REPO="banglangthang/lazy-bot"
 LATEST_TAG=$(curl -s https://api.github.com/repos/${REPO}/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
-DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${LATEST_TAG}/${DMG_NAME}"
-HTTP_CODE=$(curl -L -o "$TMP_DMG" -w "%{http_code}" "$DOWNLOAD_URL" 2>/dev/null)
 
-if [ "$HTTP_CODE" != "200" ] || [ ! -s "$TMP_DMG" ]; then
-    echo -e "${RED}❌ Could not download DMG from GitHub releases.${NC}"
+# Find DMG file from release assets
+DMG_URL=$(curl -s https://api.github.com/repos/${REPO}/releases/latest | grep -o '"browser_download_url": *"[^"]*\.dmg"' | head -1 | cut -d'"' -f4)
+
+if [ -z "$DMG_URL" ]; then
+    echo -e "${RED}❌ Could not find DMG in latest release.${NC}"
     echo -e "${YELLOW}   Download manually from: https://github.com/${REPO}/releases${NC}"
-    rm -f "$TMP_DMG"
+    exit 1
+fi
+
+# Download DMG to temp location
+TMP_DMG="/tmp/lazy-bot.dmg"
+echo -e "${BLUE}Downloading latest release...${NC}"
+if ! curl -L -o "$TMP_DMG" "$DMG_URL" 2>/dev/null; then
+    echo -e "${RED}❌ Failed to download DMG${NC}"
     exit 1
 fi
 echo -e "${GREEN}✅ Downloaded${NC}"
@@ -51,33 +53,54 @@ echo -e "${GREEN}✅ Downloaded${NC}"
 # -------------------------------------------------------------------
 # Step 3: Mount DMG and install the app
 # -------------------------------------------------------------------
-echo -e "${BLUE}Installing HRM MCP.app...${NC}"
+echo -e "${BLUE}Installing lazy-bot.app...${NC}"
 
-hdiutil detach "/Volumes/HRM MCP" 2>/dev/null || true
-hdiutil attach "$TMP_DMG" -nobrowse -quiet
-cp -R "/Volumes/HRM MCP/HRM MCP.app" "/Applications/" 2>/dev/null || true
-hdiutil detach "/Volumes/HRM MCP" -quiet 2>/dev/null || true
+# Detach any existing lazy-bot volumes
+for vol in /Volumes/lazy-bot*; do
+    if [[ -d "$vol" ]]; then
+        hdiutil detach "$vol" -quiet 2>/dev/null || true
+    fi
+done
+
+# Mount DMG and detect mount point
+MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse -quiet | tail -1 | awk '{print $NF}')
+if [[ -z "$MOUNT_POINT" ]]; then
+    echo -e "${RED}❌ Failed to mount DMG${NC}"
+    rm -f "$TMP_DMG"
+    exit 1
+fi
+
+# Install the app
+if cp -R "${MOUNT_POINT}/lazy-bot.app" "/Applications/"; then
+    echo -e "${GREEN}✅ lazy-bot.app installed to /Applications${NC}"
+else
+    echo -e "${RED}❌ Failed to install app${NC}"
+    hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null || true
+    rm -f "$TMP_DMG"
+    exit 1
+fi
+
+# Cleanup
+hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null || true
 rm -f "$TMP_DMG"
-xattr -cr "/Applications/HRM MCP.app" 2>/dev/null || true
-
-echo -e "${GREEN}✅ HRM MCP.app installed to /Applications${NC}"
+xattr -cr "/Applications/lazy-bot.app" 2>/dev/null || true
 
 # -------------------------------------------------------------------
 # Step 4: Launch the app (starts MCP server on port 1222)
 # -------------------------------------------------------------------
-echo -e "${BLUE}Launching HRM MCP...${NC}"
-open -a "HRM MCP"
+echo -e "${BLUE}Launching lazy-bot...${NC}"
+open -a "lazy-bot"
 echo -e "${GREEN}✅ Server starting on http://localhost:1222/mcp${NC}"
 
 # -------------------------------------------------------------------
 # Step 5: Configure Raycast MCP
 # -------------------------------------------------------------------
 # Create a temporary config file for Raycast to import
-MCP_CONFIG="$HOME/Desktop/lazy-timesheet-mcp.json"
+MCP_CONFIG="$HOME/Desktop/lazy-bot.json"
 cat > "$MCP_CONFIG" << 'EOF'
 {
   "mcpServers": {
-    "HRM Timesheet": {
+    "lazy-bot": {
       "url": "http://localhost:1222/mcp"
     }
   }
@@ -91,13 +114,13 @@ echo -e "${BOLD}============================================================${NC
 echo ""
 echo -e "  1. Raycast is opening now..."
 echo -e "  2. Type: ${BOLD}Import MCP Servers${NC} → hit Enter"
-echo -e "  3. Select: ${BOLD}lazy-timesheet-mcp.json${NC} from your Desktop"
+echo -e "  3. Select: ${BOLD}lazy-bot.json${NC} from your Desktop"
 echo ""
 echo -e "${BOLD}Then try in Raycast AI Chat:${NC}"
 echo -e "  ${GREEN}\"What is my employee info?\"${NC}"
-echo -e "  ${GREEN}\"Log 8 hours for KT-001 today\"${NC}"
+echo -e "  ${GREEN}\"Log 8 hours for TICKET-001 today\"${NC}"
 echo ""
-echo -e "${YELLOW}Note: First time will open a browser for HRM login.${NC}"
+echo -e "${YELLOW}Note: First time will open a browser for login.${NC}"
 echo -e "${BOLD}============================================================${NC}"
 
 # Bring Raycast to the foreground
