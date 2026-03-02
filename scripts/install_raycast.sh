@@ -51,10 +51,22 @@ echo -e "${GREEN}✅ Downloaded${NC}"
 # -------------------------------------------------------------------
 echo -e "${BLUE}Installing lazy-bot.app...${NC}"
 
-hdiutil detach "/Volumes/lazy-bot" 2>/dev/null || true
-hdiutil attach "$TMP_DMG" -nobrowse -quiet
-cp -R "/Volumes/lazy-bot/lazy-bot.app" "/Applications/" 2>/dev/null || true
-hdiutil detach "/Volumes/lazy-bot" -quiet 2>/dev/null || true
+# Detach any existing lazy-bot volumes
+for vol in /Volumes/lazy-bot*; do
+    if [[ -d "$vol" ]]; then
+        hdiutil detach "$vol" -quiet 2>/dev/null || true
+    fi
+done
+
+# Mount DMG and detect mount point
+MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse -quiet | tail -1 | awk '{print $NF}')
+if [[ -z "$MOUNT_POINT" ]]; then
+    echo -e "${RED}❌ Failed to mount DMG${NC}"
+    exit 1
+fi
+
+cp -R "${MOUNT_POINT}/lazy-bot.app" "/Applications/" 2>/dev/null || true
+hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null || true
 rm -f "$TMP_DMG"
 xattr -cr "/Applications/lazy-bot.app" 2>/dev/null || true
 
