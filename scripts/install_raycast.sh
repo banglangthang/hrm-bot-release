@@ -63,7 +63,7 @@ for vol in /Volumes/lazy-bot*; do
 done
 
 # Mount DMG and detect mount point
-MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse -quiet | tail -1 | awk '{print $NF}')
+MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse | grep -o '/Volumes/.*' | tail -1)
 if [[ -z "$MOUNT_POINT" ]]; then
     echo -e "${RED}❌ Failed to mount DMG${NC}"
     rm -f "$TMP_DMG"
