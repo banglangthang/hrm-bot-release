@@ -27,25 +27,16 @@ fi
 echo -e "${GREEN}✅ Raycast is installed${NC}"
 
 # -------------------------------------------------------------------
-# Step 2: Download the latest DMG from GitHub releases
+# Step 2: Download the latest DMG
 # -------------------------------------------------------------------
-REPO="banglangthang/lazy-bot"
-LATEST_TAG=$(curl -s https://api.github.com/repos/${REPO}/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
-
-# Find DMG file from release assets
-DMG_URL=$(curl -s https://api.github.com/repos/${REPO}/releases/latest | grep -o '"browser_download_url": *"[^"]*\.dmg"' | head -1 | cut -d'"' -f4)
-
-if [ -z "$DMG_URL" ]; then
-    echo -e "${RED}❌ Could not find DMG in latest release.${NC}"
-    echo -e "${YELLOW}   Download manually from: https://github.com/${REPO}/releases${NC}"
-    exit 1
-fi
-
-# Download DMG to temp location
+# Download DMG from Google Drive (replace with your actual Google Drive URL)
+DMG_URL="https://drive.google.com/uc?export=download&id=YOUR_GOOGLE_DRIVE_FILE_ID"
 TMP_DMG="/tmp/lazy-bot.dmg"
-echo -e "${BLUE}Downloading latest release...${NC}"
+
+echo -e "${BLUE}Downloading from Google Drive...${NC}"
 if ! curl -L -o "$TMP_DMG" "$DMG_URL" 2>/dev/null; then
-    echo -e "${RED}❌ Failed to download DMG${NC}"
+    echo -e "${RED}❌ Failed to download DMG from Google Drive${NC}"
+    echo -e "${YELLOW}   Please download manually from: https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID/view${NC}"
     exit 1
 fi
 echo -e "${GREEN}✅ Downloaded${NC}"
