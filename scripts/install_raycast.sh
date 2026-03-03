@@ -27,72 +27,26 @@ fi
 echo -e "${GREEN}✅ Raycast is installed${NC}"
 
 # -------------------------------------------------------------------
-# Step 2: Download the latest DMG
-# -------------------------------------------------------------------
-# First try to download from Google Drive (company-only access)
-DMG_URL="https://drive.google.com/uc?export=download&id=YOUR_GOOGLE_DRIVE_FILE_ID"
-TMP_DMG="/tmp/lazy-bot.dmg"
-
-echo -e "${BLUE}Downloading from Google Drive...${NC}"
-if curl -L -o "$TMP_DMG" "$DMG_URL" 2>/dev/null; then
-    echo -e "${GREEN}✅ Downloaded from Google Drive${NC}"
-else
-    # Fallback to GitHub releases
-    echo -e "${YELLOW}⚠️  Google Drive download failed, trying GitHub releases...${NC}"
-    REPO="banglangthang/lazy-bot"
-    LATEST_TAG=$(curl -s https://api.github.com/repos/${REPO}/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
-    
-    # Find DMG file from release assets
-    DMG_URL=$(curl -s https://api.github.com/repos/${REPO}/releases/latest | grep -o '"browser_download_url": *"[^"]*\.dmg"' | head -1 | cut -d'"' -f4)
-    
-    if [ -z "$DMG_URL" ]; then
-        echo -e "${RED}❌ Could not find DMG in any source.${NC}"
-        echo -e "${YELLOW}   Download manually from: https://github.com/${REPO}/releases${NC}"
-        exit 1
-    fi
-    
-    echo -e "${BLUE}Downloading from GitHub releases...${NC}"
-    if ! curl -L -o "$TMP_DMG" "$DMG_URL" 2>/dev/null; then
-        echo -e "${RED}❌ Failed to download DMG from GitHub${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}✅ Downloaded from GitHub${NC}"
-fi
-
-# -------------------------------------------------------------------
-# Step 3: Mount DMG and install the app
+# Step 2: Install lazy-bot.app
 # -------------------------------------------------------------------
 echo -e "${BLUE}Installing lazy-bot.app...${NC}"
 
-# Detach any existing lazy-bot volumes
-for vol in /Volumes/lazy-bot*; do
-    if [[ -d "$vol" ]]; then
-        hdiutil detach "$vol" -quiet 2>/dev/null || true
-    fi
-done
-
-# Mount DMG and detect mount point
-MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse | grep -o '/Volumes/.*' | tail -1)
-if [[ -z "$MOUNT_POINT" ]]; then
-    echo -e "${RED}❌ Failed to mount DMG${NC}"
-    rm -f "$TMP_DMG"
+# Check if lazy-bot.app exists in Applications
+if [ ! -d "/Applications/lazy-bot.app" ]; then
+    echo -e "${YELLOW}⚠️  lazy-bot.app not found in /Applications${NC}"
+    echo -e "${YELLOW}   Please download and install lazy-bot.app manually${NC}"
+    echo -e "${YELLOW}   Then run this installer again${NC}"
     exit 1
 fi
 
-# Install the app
-if cp -R "${MOUNT_POINT}/lazy-bot.app" "/Applications/"; then
-    echo -e "${GREEN}✅ lazy-bot.app installed to /Applications${NC}"
-else
-    echo -e "${RED}❌ Failed to install app${NC}"
-    hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null || true
-    rm -f "$TMP_DMG"
-    exit 1
-fi
+echo -e "${GREEN}✅ lazy-bot.app found in /Applications${NC}"
 
-# Cleanup
-hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null || true
-rm -f "$TMP_DMG"
+# -------------------------------------------------------------------
+# Step 3: Bypass Gatekeeper (if needed)
+# -------------------------------------------------------------------
+echo -e "${BLUE}Bypassing Gatekeeper...${NC}"
 xattr -cr "/Applications/lazy-bot.app" 2>/dev/null || true
+echo -e "${GREEN}✅ Gatekeeper bypassed${NC}"
 
 # -------------------------------------------------------------------
 # Step 4: Launch the app (starts MCP server on port 1222)
@@ -118,7 +72,7 @@ EOF
 
 echo ""
 echo -e "${BOLD}============================================================${NC}"
-echo -e "${GREEN}${BOLD}🎉 Almost done! One last step:${NC}"
+echo -e "${GREEN}${BOLD}🎉 Installation complete!${NC}"
 echo -e "${BOLD}============================================================${NC}"
 echo ""
 echo -e "  1. Raycast is opening now..."
