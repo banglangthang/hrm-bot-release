@@ -1,8 +1,9 @@
 # Installation
 
 ## Quick Install (Recommended)
-
-Run this single command in Terminal:
+1. Dowload lazy-bot file from goolge drive
+2. Install lazy-bot app as many other Mac Application
+3. Run this single command in Terminal:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/banglangthang/lazy-bot/main/scripts/install_raycast.sh)
