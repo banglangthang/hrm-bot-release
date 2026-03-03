@@ -27,7 +27,7 @@ fi
 echo -e "${GREEN}✅ Raycast is installed${NC}"
 
 # -------------------------------------------------------------------
-# Step 2: Install lazy-bot.app
+# Step 2: Mount DMG and install the app
 # -------------------------------------------------------------------
 echo -e "${BLUE}Installing lazy-bot.app...${NC}"
 
@@ -49,14 +49,14 @@ xattr -cr "/Applications/lazy-bot.app" 2>/dev/null || true
 echo -e "${GREEN}✅ Gatekeeper bypassed${NC}"
 
 # -------------------------------------------------------------------
-# Step 4: Launch the app (starts MCP server on port 1222)
+# Step 3: Launch the app (starts MCP server on port 1222)
 # -------------------------------------------------------------------
 echo -e "${BLUE}Launching lazy-bot...${NC}"
 open -a "lazy-bot"
 echo -e "${GREEN}✅ Server starting on http://localhost:1222/mcp${NC}"
 
 # -------------------------------------------------------------------
-# Step 5: Configure Raycast MCP
+# Step 4: Configure Raycast MCP
 # -------------------------------------------------------------------
 # Create a temporary config file for Raycast to import
 MCP_CONFIG="$HOME/Desktop/lazy-bot.json"
