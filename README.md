@@ -11,7 +11,7 @@ A macOS menu bar app that provides AI-powered timesheet management through a sim
 
 ## Installation
 - **[Installation Link](installation.md)**: Install lazy-bot app, and Raycast
-- **[Config Link](cgpt-config/READ.md):**: Configs file for setting CGPT with Local IDE
+- **[Config Link](cgpt-config/README.md):**: Configs file for setting CGPT with Local IDE
 ## Connect Your AI Tool
 After installing, configure your AI tool to connect to (Any AI tools that support MCP):
 - **MCP Server**: `http://localhost:1222/mcp`
